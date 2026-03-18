@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'trip_screen.dart';
 import 'add_vehicle_screen.dart';
+import 'trip_map_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -162,37 +163,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildTripCard(dynamic trip) {
     int score = trip['efficiency_score'] ?? 0;
     Color scoreColor = score >= 80 ? Colors.greenAccent : score >= 60 ? Colors.orangeAccent : Colors.redAccent;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF16213E), borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(color: scoreColor.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-                child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
-              ),
-            ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TripMapScreen(
+              tripId: trip['id'],
+              title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip',
+            ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _buildTripStat('Avg Speed', '${trip['avg_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
-              const SizedBox(width: 20),
-              _buildTripStat('Max Speed', '${trip['max_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
-              const SizedBox(width: 20),
-              _buildTripStat('Duration', '${trip['trip_duration']?.toStringAsFixed(0) ?? '0'} min'),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white38, fontStyle: FontStyle.italic)),
-        ],
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: const Color(0xFF16213E), borderRadius: BorderRadius.circular(12)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                  child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildTripStat('Avg Speed', '${trip['avg_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
+                const SizedBox(width: 20),
+                _buildTripStat('Max Speed', '${trip['max_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
+                const SizedBox(width: 20),
+                _buildTripStat('Duration', '${trip['trip_duration']?.toStringAsFixed(0) ?? '0'} min'),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white38, fontStyle: FontStyle.italic)),
+                ),
+                const Icon(Icons.map, color: Color(0xFF00D2FF), size: 20),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
