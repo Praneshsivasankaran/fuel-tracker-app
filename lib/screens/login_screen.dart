@@ -18,37 +18,21 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
 
   Future<void> _login() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final result = await ApiService.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
+    setState(() { _isLoading = true; _errorMessage = null; });
+    final result = await ApiService.login(_emailController.text.trim(), _passwordController.text);
+    setState(() => _isLoading = false);
     if (result['success']) {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     } else {
-      setState(() {
-        _errorMessage = result['message'];
-      });
+      setState(() => _errorMessage = result['message']);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
@@ -56,121 +40,78 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF16213E),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFF2D7AFF).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(
-                  Icons.local_gas_station,
-                  size: 60,
-                  color: Color(0xFF00D2FF),
-                ),
+                child: const Icon(Icons.local_gas_station, size: 64, color: Color(0xFF2D7AFF)),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Fuel Tracker',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              Text('Welcome Back', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
               const SizedBox(height: 8),
-              Text(
-                'Track your driving efficiency',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.white54,
-                ),
-              ),
+              Text('Sign in to continue', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
               const SizedBox(height: 40),
               TextField(
                 controller: _emailController,
-                style: const TextStyle(color: Colors.white),
+                style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E)),
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  labelStyle: const TextStyle(color: Colors.white54),
-                  prefixIcon: const Icon(Icons.email, color: Color(0xFF00D2FF)),
+                  labelStyle: GoogleFonts.poppins(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF2D7AFF)),
                   filled: true,
-                  fillColor: const Color(0xFF16213E),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
+                  fillColor: const Color(0xFFF5F7FA),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF2D7AFF), width: 2)),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
-                style: const TextStyle(color: Colors.white),
+                style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E)),
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.white54),
-                  prefixIcon: const Icon(Icons.lock, color: Color(0xFF00D2FF)),
+                  labelStyle: GoogleFonts.poppins(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF2D7AFF)),
                   filled: true,
-                  fillColor: const Color(0xFF16213E),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
+                  fillColor: const Color(0xFFF5F7FA),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF2D7AFF), width: 2)),
                 ),
               ),
               const SizedBox(height: 12),
               if (_errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: Colors.redAccent, fontSize: 14),
-                  ),
+                  child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 14)),
                 ),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00D2FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    backgroundColor: const Color(0xFF2D7AFF),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          'Login',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1A1A2E),
-                          ),
-                        ),
+                      : Text('Login', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                  );
-                },
+                onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterScreen())),
                 child: RichText(
                   text: TextSpan(
                     text: "Don't have an account? ",
-                    style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14),
-                    children: [
-                      TextSpan(
-                        text: 'Register',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF00D2FF),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                    style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
+                    children: [TextSpan(text: 'Register', style: GoogleFonts.poppins(color: const Color(0xFF2D7AFF), fontWeight: FontWeight.w600))],
                   ),
                 ),
               ),
