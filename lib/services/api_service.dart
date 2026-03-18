@@ -131,6 +131,15 @@ class ApiService {
     return null;
   }
 
+  static Future<Map<String, dynamic>?> getAnalytics() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/analytics'),
+      headers: {'Authorization': 'Bearer $_token'},
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return null;
+  }
+
   static Future<Map<String, dynamic>?> getTripRoute(int tripId) async {
     final response = await http.get(
       Uri.parse('$baseUrl/trip/$tripId/route'),

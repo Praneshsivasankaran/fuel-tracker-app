@@ -5,6 +5,7 @@ import 'login_screen.dart';
 import 'trip_screen.dart';
 import 'add_vehicle_screen.dart';
 import 'trip_map_screen.dart';
+import 'analytics_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -52,6 +53,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: Text('Dashboard', style: GoogleFonts.poppins()),
         backgroundColor: const Color(0xFF16213E),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalyticsScreen()));
+            },
+          ),
           IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
         ],
       ),
@@ -188,7 +195,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(color: scoreColor.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
                   child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
                 ),
               ],
