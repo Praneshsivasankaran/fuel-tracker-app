@@ -56,6 +56,14 @@ class ApiService {
     return null;
   }
 
+  static Future<bool> deleteVehicle(int vehicleId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/vehicles/$vehicleId'),
+      headers: {'Authorization': 'Bearer $_token'},
+    );
+    return response.statusCode == 200;
+  }
+
   static Future<List<dynamic>> getVehicles() async {
     final response = await http.get(
       Uri.parse('$baseUrl/vehicles'),

@@ -27,6 +27,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() { _vehicles = vehicles; _trips = trips; _isLoading = false; });
   }
 
+  Future<void> _deleteVehicle(int vehicleId, String name) async {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Delete Vehicle', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+        content: Text('Delete $name and all its trips? This cannot be undone.', style: GoogleFonts.poppins(color: Colors.grey)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey))),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final success = await ApiService.deleteVehicle(vehicleId);
+              if (success) {
+                _loadData();
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehicle deleted'), backgroundColor: Colors.redAccent));
+              }
+            },
+            child: Text('Delete', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return '';
+    try {
+      final date = DateTime.parse(dateStr);
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +147,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildVehicleCard(dynamic vehicle) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TripScreen(vehicle: vehicle))),
+      onTap: () async {
+        final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => TripScreen(vehicle: vehicle)));
+        if (result == true) _loadData();
+      },
+      onLongPress: () => _deleteVehicle(vehicle['id'], vehicle['vehicle_model'] ?? 'this vehicle'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(16),
@@ -145,6 +187,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildTripCard(dynamic trip) {
     int score = trip['efficiency_score'] ?? 0;
     Color scoreColor = score >= 80 ? const Color(0xFF00C9A7) : score >= 60 ? Colors.orange : Colors.redAccent;
+    String dateStr = _formatDate(trip['start_time']?.toString());
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TripMapScreen(tripId: trip['id'], title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip'))),
       child: Container(
@@ -157,7 +200,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+                    if (dateStr.isNotEmpty)
+                      Text(dateStr, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+                  ],
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
@@ -178,7 +228,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic))),
+                Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis)),
                 const Icon(Icons.map_rounded, color: Color(0xFF2D7AFF), size: 20),
               ],
             ),
