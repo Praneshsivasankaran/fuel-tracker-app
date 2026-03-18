@@ -25,23 +25,24 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF16213E),
-          border: Border(top: BorderSide(color: Color(0xFF1A1A2E), width: 1)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2))],
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) => setState(() => _currentIndex = index),
-          backgroundColor: const Color(0xFF16213E),
-          selectedItemColor: const Color(0xFF00D2FF),
-          unselectedItemColor: Colors.white38,
+          backgroundColor: Colors.white,
+          selectedItemColor: const Color(0xFF2D7AFF),
+          unselectedItemColor: Colors.grey,
           selectedLabelStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
           unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
           type: BottomNavigationBarType.fixed,
+          elevation: 0,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-            BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Analytics'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Dashboard'),
+            BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: 'Analytics'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
           ],
         ),
       ),
