@@ -131,6 +131,22 @@ class ApiService {
     return null;
   }
 
+  static Future<List<dynamic>> getVehicleBrands() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/vehicle-database/brands'),
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return [];
+  }
+
+  static Future<List<dynamic>> getVehicleDatabase({String? brand}) async {
+    String url = '$baseUrl/vehicle-database';
+    if (brand != null) url += '?brand=$brand';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    return [];
+  }
+
   static Future<Map<String, dynamic>?> getAnalytics() async {
     final response = await http.get(
       Uri.parse('$baseUrl/analytics'),
