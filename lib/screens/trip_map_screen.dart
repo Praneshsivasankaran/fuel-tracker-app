@@ -20,72 +20,35 @@ class _TripMapScreenState extends State<TripMapScreen> {
   LatLng _center = const LatLng(13.0827, 80.2707);
 
   @override
-  void initState() {
-    super.initState();
-    _loadRoute();
-  }
+  void initState() { super.initState(); _loadRoute(); }
 
   Future<void> _loadRoute() async {
     final data = await ApiService.getTripRoute(widget.tripId);
-
     if (data != null) {
       List<LatLng> points = [];
-
       double startLat = data['start_lat'] ?? 0;
       double startLng = data['start_lng'] ?? 0;
       double endLat = data['end_lat'] ?? 0;
       double endLng = data['end_lng'] ?? 0;
-
-      if (startLat != 0 && startLng != 0) {
-        points.add(LatLng(startLat, startLng));
-      }
-
+      if (startLat != 0 && startLng != 0) points.add(LatLng(startLat, startLng));
       List locations = data['locations'] ?? [];
-      for (var loc in locations) {
-        points.add(LatLng(loc['latitude'], loc['longitude']));
-      }
-
-      if (endLat != 0 && endLng != 0) {
-        points.add(LatLng(endLat, endLng));
-      }
-
+      for (var loc in locations) points.add(LatLng(loc['latitude'], loc['longitude']));
+      if (endLat != 0 && endLng != 0) points.add(LatLng(endLat, endLng));
       Set<Marker> markers = {};
       if (points.isNotEmpty) {
-        markers.add(Marker(
-          markerId: const MarkerId('start'),
-          position: points.first,
-          infoWindow: const InfoWindow(title: 'Start'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ));
-
+        markers.add(Marker(markerId: const MarkerId('start'), position: points.first, infoWindow: const InfoWindow(title: 'Start'), icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen)));
         if (points.length > 1) {
-          markers.add(Marker(
-            markerId: const MarkerId('end'),
-            position: points.last,
-            infoWindow: const InfoWindow(title: 'End'),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-          ));
+          markers.add(Marker(markerId: const MarkerId('end'), position: points.last, infoWindow: const InfoWindow(title: 'End'), icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)));
         }
       }
-
       setState(() {
         _markers = markers;
         if (points.length > 1) {
-          _polylines = {
-            Polyline(
-              polylineId: const PolylineId('route'),
-              points: points,
-              color: const Color(0xFF00D2FF),
-              width: 4,
-            ),
-          };
+          _polylines = {Polyline(polylineId: const PolylineId('route'), points: points, color: const Color(0xFF2D7AFF), width: 4)};
         }
-        if (points.isNotEmpty) {
-          _center = points.first;
-        }
+        if (points.isNotEmpty) _center = points.first;
         _isLoading = false;
       });
-
       if (_mapController != null && points.isNotEmpty) {
         _mapController!.animateCamera(CameraUpdate.newLatLng(_center));
       }
@@ -97,23 +60,20 @@ class _TripMapScreenState extends State<TripMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: Text(widget.title, style: GoogleFonts.poppins()),
-        backgroundColor: const Color(0xFF16213E),
+        title: Text(widget.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF1A1A2E)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D2FF)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF2D7AFF)))
           : GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 14,
-              ),
+              initialCameraPosition: CameraPosition(target: _center, zoom: 14),
               polylines: _polylines,
               markers: _markers,
-              onMapCreated: (controller) {
-                _mapController = controller;
-              },
+              onMapCreated: (controller) => _mapController = controller,
               myLocationEnabled: false,
               zoomControlsEnabled: true,
             ),
