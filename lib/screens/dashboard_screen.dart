@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
-import 'login_screen.dart';
 import 'trip_screen.dart';
 import 'add_vehicle_screen.dart';
 import 'trip_map_screen.dart';
-import 'analytics_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -36,15 +34,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Future<void> _logout() async {
-    await ApiService.logout();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,15 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Text('Dashboard', style: GoogleFonts.poppins()),
         backgroundColor: const Color(0xFF16213E),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AnalyticsScreen()));
-            },
-          ),
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
-        ],
+        automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF00D2FF)))
