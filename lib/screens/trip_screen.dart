@@ -162,7 +162,7 @@ class _TripScreenState extends State<TripScreen> {
               Text('Trip Complete', style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w600, fontSize: 18)),
             ],
           ),
-          content: Column(
+         content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _resultRow('Distance', '${_totalDistance.toStringAsFixed(2)} km'),
@@ -170,6 +170,22 @@ class _TripScreenState extends State<TripScreen> {
               _resultRow('Max Speed', '${_maxSpeed.toStringAsFixed(1)} km/h'),
               _resultRow('Duration', '${duration.toStringAsFixed(1)} min'),
               _resultRow('Score', '${result['efficiency_score']}'),
+              Builder(builder: (context) {
+                String rec = result['recommendation'] ?? '';
+                RegExp regex = RegExp(r'Predicted fuel: ([\d.]+)L');
+                Match? match = regex.firstMatch(rec);
+                if (match != null) {
+                  double fuel = double.tryParse(match.group(1)!) ?? 0;
+                  if (fuel > 0) {
+                    double cost = fuel * 102.86;
+                    return Column(children: [
+                      _resultRow('Est. Fuel', '${fuel.toStringAsFixed(2)} L'),
+                      _resultRow('Est. Cost', 'Rs ${cost.toStringAsFixed(0)}'),
+                    ]);
+                  }
+                }
+                return const SizedBox();
+              }),
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
