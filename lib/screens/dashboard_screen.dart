@@ -16,8 +16,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> _vehicles = [];
   List<dynamic> _trips = [];
   bool _isLoading = true;
+  String _userName = '';
 
-  // Current fuel prices in India (Rs per litre)
   final double _petrolPrice = 102.86;
   final double _dieselPrice = 89.39;
 
@@ -28,7 +28,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _isLoading = true);
     final vehicles = await ApiService.getVehicles();
     final trips = await ApiService.getTrips();
-    setState(() { _vehicles = vehicles; _trips = trips; _isLoading = false; });
+    final user = await ApiService.getMe();
+    setState(() {
+      _vehicles = vehicles;
+      _trips = trips;
+      _userName = user?['name'] ?? '';
+      _isLoading = false;
+    });
   }
 
   Future<void> _deleteVehicle(int vehicleId, String name) async {
@@ -42,11 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey))),
           TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await ApiService.deleteVehicle(vehicleId);
-              _loadData();
-            },
+            onPressed: () async { Navigator.pop(ctx); await ApiService.deleteVehicle(vehicleId); _loadData(); },
             child: Text('Delete', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -65,11 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey))),
           TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await ApiService.deleteTrip(tripId);
-              _loadData();
-            },
+            onPressed: () async { Navigator.pop(ctx); await ApiService.deleteTrip(tripId); _loadData(); },
             child: Text('Delete', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.w600)),
           ),
         ],
@@ -83,9 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final date = DateTime.parse(dateStr);
       final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    } catch (e) {
-      return '';
-    }
+    } catch (e) { return ''; }
   }
 
   String _estimateFuelCost(dynamic trip) {
@@ -94,12 +90,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Match? match = regex.firstMatch(rec);
     if (match != null) {
       double fuel = double.tryParse(match.group(1)!) ?? 0;
-      if (fuel > 0) {
-        double cost = fuel * _petrolPrice;
-        return '~Rs ${cost.toStringAsFixed(0)}';
-      }
+      if (fuel > 0) return '~Rs ${(fuel * _petrolPrice).toStringAsFixed(0)}';
     }
     return '';
+  }
+
+  IconData _getVehicleIcon(String model) {
+    String lower = model.toLowerCase();
+    if (lower.contains('activa') || lower.contains('dio') || lower.contains('jupiter') || lower.contains('ntorq') || lower.contains('access') || lower.contains('burgman') || lower.contains('maestro') || lower.contains('pleasure') || lower.contains('fascino') || lower.contains('ray zr') || lower.contains('scooter')) {
+      return Icons.electric_moped_rounded;
+    }
+    if (lower.contains('classic') || lower.contains('bullet') || lower.contains('hunter') || lower.contains('himalayan') || lower.contains('meteor') || lower.contains('shine') || lower.contains('sp 125') || lower.contains('unicorn') || lower.contains('hornet') || lower.contains('cb200') || lower.contains('pulsar') || lower.contains('dominar') || lower.contains('platina') || lower.contains('apache') || lower.contains('raider') || lower.contains('star city') || lower.contains('splendor') || lower.contains('hf deluxe') || lower.contains('glamour') || lower.contains('xtreme') || lower.contains('xpulse') || lower.contains('fz') || lower.contains('mt-15') || lower.contains('r15') || lower.contains('duke') || lower.contains('rc 200') || lower.contains('gixxer') || lower.contains('bike')) {
+      return Icons.two_wheeler_rounded;
+    }
+    return Icons.directions_car_rounded;
   }
 
   @override
@@ -108,25 +112,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text('Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white, elevation: 0, automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF2D7AFF)))
           : RefreshIndicator(
-              color: const Color(0xFF2D7AFF),
-              onRefresh: _loadData,
+              color: const Color(0xFF2D7AFF), onRefresh: _loadData,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Fuel Price Card
+                    if (_userName.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text('Hi $_userName!', style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
+                      ),
                     Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      width: double.infinity, padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(colors: [Color(0xFF2D7AFF), Color(0xFF00C9A7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                         borderRadius: BorderRadius.circular(16),
@@ -136,43 +140,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const Icon(Icons.local_gas_station_rounded, color: Colors.white, size: 32),
                           const SizedBox(width: 14),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Today's Fuel Prices (Chennai)", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white70)),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Text('Petrol: Rs ${_petrolPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                                    const SizedBox(width: 16),
-                                    Text('Diesel: Rs ${_dieselPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-                                  ],
-                                ),
-                              ],
-                            ),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text("Today's Fuel Prices (Chennai)", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white70)),
+                              const SizedBox(height: 4),
+                              Row(children: [
+                                Text('Petrol: Rs ${_petrolPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                                const SizedBox(width: 16),
+                                Text('Diesel: Rs ${_dieselPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                              ]),
+                            ]),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Stats
-                    Row(
-                      children: [
-                        _buildStatCard('Vehicles', _vehicles.length.toString(), Icons.directions_car_rounded, const Color(0xFF2D7AFF)),
-                        const SizedBox(width: 12),
-                        _buildStatCard('Trips', _trips.length.toString(), Icons.route_rounded, const Color(0xFF00C9A7)),
-                      ],
-                    ),
+                    Row(children: [
+                      _buildStatCard('Vehicles', _vehicles.length.toString(), Icons.directions_car_rounded, const Color(0xFF2D7AFF)),
+                      const SizedBox(width: 12),
+                      _buildStatCard('Trips', _trips.length.toString(), Icons.route_rounded, const Color(0xFF00C9A7)),
+                    ]),
                     const SizedBox(height: 24),
                     Text('My Vehicles', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text('Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
                     const SizedBox(height: 8),
                     if (_vehicles.isEmpty) _buildEmptyCard('No vehicles yet. Tap + to add one!')
                     else ..._vehicles.map((v) => _buildVehicleCard(v)),
                     const SizedBox(height: 24),
                     Text('Recent Trips', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text('Tap for map • Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
                     const SizedBox(height: 8),
                     if (_trips.isEmpty) _buildEmptyCard('No trips recorded yet.')
@@ -186,8 +182,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddVehicleScreen()));
           if (result == true) _loadData();
         },
-        backgroundColor: const Color(0xFF2D7AFF),
-        elevation: 2,
+        backgroundColor: const Color(0xFF2D7AFF), elevation: 2,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -198,23 +193,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
-                Text(title, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
-              ],
-            ),
-          ],
-        ),
+        child: Row(children: [
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: color, size: 24)),
+          const SizedBox(width: 12),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(value, style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
+            Text(title, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+          ]),
+        ]),
       ),
     );
   }
@@ -227,33 +213,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
       onLongPress: () => _deleteVehicle(vehicle['id'], vehicle['vehicle_model'] ?? 'this vehicle'),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: const Color(0xFF2D7AFF).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.directions_car_rounded, color: Color(0xFF2D7AFF), size: 28),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(vehicle['vehicle_model'] ?? 'Unknown', style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                  Text('${vehicle['engine_size']}L • ${vehicle['fuel_type']}', style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey)),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0xFF00C9A7).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF00C9A7), size: 22),
-            ),
-          ],
-        ),
+        child: Row(children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: const Color(0xFF2D7AFF).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+            child: Icon(_getVehicleIcon(vehicle['vehicle_model'] ?? ''), color: const Color(0xFF2D7AFF), size: 28),
+          ),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(vehicle['vehicle_model'] ?? 'Unknown', style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+            Text('${vehicle['engine_size']}L • ${vehicle['fuel_type']}', style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey)),
+          ])),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: const Color(0xFF00C9A7).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+            child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF00C9A7), size: 22),
+          ),
+        ]),
       ),
     );
   }
@@ -267,77 +245,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TripMapScreen(tripId: trip['id'], title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip'))),
       onLongPress: () => _deleteTrip(trip['id']),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                    if (dateStr.isNotEmpty)
-                      Text(dateStr, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                      child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
-                    ),
-                    if (fuelCost.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(fuelCost, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D7AFF))),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                _buildTripStat('Avg Speed', '${trip['avg_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
-                const SizedBox(width: 20),
-                _buildTripStat('Max Speed', '${trip['max_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
-                const SizedBox(width: 20),
-                _buildTripStat('Duration', '${trip['trip_duration']?.toStringAsFixed(0) ?? '0'} min'),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis)),
-                const Icon(Icons.map_rounded, color: Color(0xFF2D7AFF), size: 20),
-              ],
-            ),
-          ],
-        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+              if (dateStr.isNotEmpty) Text(dateStr, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+            ]),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
+              ),
+              if (fuelCost.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Text(fuelCost, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D7AFF)))),
+            ]),
+          ]),
+          const SizedBox(height: 10),
+          Row(children: [
+            _buildTripStat('Avg Speed', '${trip['avg_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
+            const SizedBox(width: 20),
+            _buildTripStat('Max Speed', '${trip['max_speed']?.toStringAsFixed(1) ?? '0'} km/h'),
+            const SizedBox(width: 20),
+            _buildTripStat('Duration', '${trip['trip_duration']?.toStringAsFixed(0) ?? '0'} min'),
+          ]),
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis)),
+            const Icon(Icons.map_rounded, color: Color(0xFF2D7AFF), size: 20),
+          ]),
+        ]),
       ),
     );
   }
 
   Widget _buildTripStat(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(value, style: GoogleFonts.poppins(fontSize: 13, color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w500)),
-        Text(label, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
-      ],
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(value, style: GoogleFonts.poppins(fontSize: 13, color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w500)),
+      Text(label, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+    ]);
   }
 
   Widget _buildEmptyCard(String message) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      width: double.infinity, padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
       child: Text(message, textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
     );
