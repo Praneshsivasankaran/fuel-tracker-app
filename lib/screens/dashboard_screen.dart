@@ -17,6 +17,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> _trips = [];
   bool _isLoading = true;
 
+  // Current fuel prices in India (Rs per litre)
+  final double _petrolPrice = 102.86;
+  final double _dieselPrice = 89.39;
+
   @override
   void initState() { super.initState(); _loadData(); }
 
@@ -34,18 +38,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Delete Vehicle', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-        content: Text('Delete $name and all its trips? This cannot be undone.', style: GoogleFonts.poppins(color: Colors.grey)),
+        content: Text('Delete $name and all its trips?', style: GoogleFonts.poppins(color: Colors.grey)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey))),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              final success = await ApiService.deleteVehicle(vehicleId);
-              if (success) {
-                _loadData();
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vehicle deleted'), backgroundColor: Colors.redAccent));
-              }
+              await ApiService.deleteVehicle(vehicleId);
+              _loadData();
+            },
+            child: Text('Delete', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteTrip(int tripId) async {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Delete Trip', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+        content: Text('Delete this trip? This cannot be undone.', style: GoogleFonts.poppins(color: Colors.grey)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: GoogleFonts.poppins(color: Colors.grey))),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await ApiService.deleteTrip(tripId);
+              _loadData();
             },
             child: Text('Delete', style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.w600)),
           ),
@@ -63,6 +86,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (e) {
       return '';
     }
+  }
+
+  String _estimateFuelCost(dynamic trip) {
+    String rec = trip['recommendation'] ?? '';
+    RegExp regex = RegExp(r'Predicted fuel: ([\d.]+)L');
+    Match? match = regex.firstMatch(rec);
+    if (match != null) {
+      double fuel = double.tryParse(match.group(1)!) ?? 0;
+      if (fuel > 0) {
+        double cost = fuel * _petrolPrice;
+        return '~Rs ${cost.toStringAsFixed(0)}';
+      }
+    }
+    return '';
   }
 
   @override
@@ -86,6 +123,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Fuel Price Card
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF2D7AFF), Color(0xFF00C9A7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.local_gas_station_rounded, color: Colors.white, size: 32),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Today's Fuel Prices (Chennai)", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white70)),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text('Petrol: Rs ${_petrolPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                                    const SizedBox(width: 16),
+                                    Text('Diesel: Rs ${_dieselPrice.toStringAsFixed(2)}', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Stats
                     Row(
                       children: [
                         _buildStatCard('Vehicles', _vehicles.length.toString(), Icons.directions_car_rounded, const Color(0xFF2D7AFF)),
@@ -95,12 +165,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text('My Vehicles', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    Text('Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+                    const SizedBox(height: 8),
                     if (_vehicles.isEmpty) _buildEmptyCard('No vehicles yet. Tap + to add one!')
                     else ..._vehicles.map((v) => _buildVehicleCard(v)),
                     const SizedBox(height: 24),
                     Text('Recent Trips', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    Text('Tap for map • Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+                    const SizedBox(height: 8),
                     if (_trips.isEmpty) _buildEmptyCard('No trips recorded yet.')
                     else ..._trips.map((t) => _buildTripCard(t)),
                   ],
@@ -188,8 +262,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     int score = trip['efficiency_score'] ?? 0;
     Color scoreColor = score >= 80 ? const Color(0xFF00C9A7) : score >= 60 ? Colors.orange : Colors.redAccent;
     String dateStr = _formatDate(trip['start_time']?.toString());
+    String fuelCost = _estimateFuelCost(trip);
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TripMapScreen(tripId: trip['id'], title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip'))),
+      onLongPress: () => _deleteTrip(trip['id']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(16),
@@ -208,10 +284,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Text(dateStr, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                      child: Text('Score: $score', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: scoreColor)),
+                    ),
+                    if (fuelCost.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(fuelCost, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2D7AFF))),
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -228,7 +314,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 10),
             Row(
               children: [
-                Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis)),
+                Expanded(child: Text(trip['recommendation'] ?? '', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey, fontStyle: FontStyle.italic), maxLines: 2, overflow: TextOverflow.ellipsis)),
                 const Icon(Icons.map_rounded, color: Color(0xFF2D7AFF), size: 20),
               ],
             ),

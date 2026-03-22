@@ -63,6 +63,13 @@ class ApiService {
     );
     return response.statusCode == 200;
   }
+  static Future<bool> deleteTrip(int tripId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/trips/$tripId'),
+      headers: {'Authorization': 'Bearer $_token'},
+    );
+    return response.statusCode == 200;
+  }
 
   static Future<List<dynamic>> getVehicles() async {
     final response = await http.get(
