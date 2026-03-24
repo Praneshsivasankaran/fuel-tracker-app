@@ -28,9 +28,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         title: Text('Analytics', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white, elevation: 0, automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF2D7AFF)))
@@ -41,22 +39,44 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Driving Summary Card
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [Color(0xFF2D7AFF), Color(0xFF00C9A7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Driving Summary', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+                            const SizedBox(height: 16),
+                            Row(children: [
+                              _buildSummaryItem('Total Trips', '${_data!['total_trips']}'),
+                              _buildSummaryItem('Distance', '${_data!['total_distance']} km'),
+                              _buildSummaryItem('Drive Time', '${_data!['total_duration']} min'),
+                            ]),
+                            const SizedBox(height: 12),
+                            Row(children: [
+                              _buildSummaryItem('Avg Speed', '${_data!['avg_speed']} km/h'),
+                              _buildSummaryItem('Top Speed', '${_data!['max_speed_ever']} km/h'),
+                              _buildSummaryItem('Avg Score', '${_data!['avg_efficiency']}'),
+                            ]),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Row(children: [
-                        _buildSummaryCard('Total Trips', '${_data!['total_trips']}', Icons.route_rounded, const Color(0xFF2D7AFF)),
+                        _buildStatCard('Total Trips', '${_data!['total_trips']}', Icons.route_rounded, const Color(0xFF2D7AFF)),
                         const SizedBox(width: 12),
-                        _buildSummaryCard('Distance', '${_data!['total_distance']} km', Icons.straighten_rounded, const Color(0xFF00C9A7)),
+                        _buildStatCard('Distance', '${_data!['total_distance']} km', Icons.straighten_rounded, const Color(0xFF00C9A7)),
                       ]),
                       const SizedBox(height: 12),
                       Row(children: [
-                        _buildSummaryCard('Avg Speed', '${_data!['avg_speed']} km/h', Icons.speed_rounded, Colors.orange),
+                        _buildStatCard('Avg Speed', '${_data!['avg_speed']} km/h', Icons.speed_rounded, Colors.orange),
                         const SizedBox(width: 12),
-                        _buildSummaryCard('Avg Score', '${_data!['avg_efficiency']}', Icons.star_rounded, const Color(0xFFFFB800)),
-                      ]),
-                      const SizedBox(height: 12),
-                      Row(children: [
-                        _buildSummaryCard('Max Speed', '${_data!['max_speed_ever']} km/h', Icons.flash_on_rounded, Colors.redAccent),
-                        const SizedBox(width: 12),
-                        _buildSummaryCard('Total Time', '${_data!['total_duration']} min', Icons.timer_rounded, Colors.purple),
+                        _buildStatCard('Avg Score', '${_data!['avg_efficiency']}', Icons.star_rounded, const Color(0xFFFFB800)),
                       ]),
                       const SizedBox(height: 24),
                       _buildChartCard('Efficiency Score Trend', _buildEfficiencyChart()),
@@ -70,41 +90,43 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryItem(String label, String value) {
+    return Expanded(
+      child: Column(children: [
+        Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(label, style: GoogleFonts.poppins(fontSize: 10, color: Colors.white70)),
+      ]),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(height: 10),
-            Text(value, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
-            Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
-          ],
-        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 10),
+          Text(value, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
+          Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
+        ]),
       ),
     );
   }
 
   Widget _buildChartCard(String title, Widget chart) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      width: double.infinity, padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-          const SizedBox(height: 16),
-          SizedBox(height: 180, child: chart),
-        ],
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
+        const SizedBox(height: 16),
+        SizedBox(height: 180, child: chart),
+      ]),
     );
   }
 

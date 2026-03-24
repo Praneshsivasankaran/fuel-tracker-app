@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
+import '../utils/page_transition.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
     if (result['success']) {
       if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+     Navigator.pushReplacement(context, SmoothPageRoute(page: const HomeScreen()));
     } else {
       setState(() => _errorMessage = result['message']);
     }

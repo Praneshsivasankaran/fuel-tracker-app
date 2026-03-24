@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../utils/page_transition.dart';
 import 'trip_screen.dart';
 import 'add_vehicle_screen.dart';
 import 'trip_map_screen.dart';
@@ -106,6 +107,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Icons.directions_car_rounded;
   }
 
+  Widget _fadeInWidget(Widget child, int index) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 400 + (index * 100)),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(offset: Offset(0, 20 * (1 - value)), child: child),
+        );
+      },
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,11 +141,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (_userName.isNotEmpty)
-                      Padding(
+                      _fadeInWidget(Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Text('Hi $_userName!', style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
-                      ),
-                    Container(
+                      ), 0),
+                    _fadeInWidget(Container(
                       width: double.infinity, padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(colors: [Color(0xFF2D7AFF), Color(0xFF00C9A7)], begin: Alignment.topLeft, end: Alignment.bottomRight),
@@ -152,34 +168,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                    ),
+                    ), 1),
                     const SizedBox(height: 16),
-                    Row(children: [
+                    _fadeInWidget(Row(children: [
                       _buildStatCard('Vehicles', _vehicles.length.toString(), Icons.directions_car_rounded, const Color(0xFF2D7AFF)),
                       const SizedBox(width: 12),
                       _buildStatCard('Trips', _trips.length.toString(), Icons.route_rounded, const Color(0xFF00C9A7)),
-                    ]),
+                    ]), 2),
                     const SizedBox(height: 24),
                     Text('My Vehicles', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
                     const SizedBox(height: 4),
                     Text('Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
                     const SizedBox(height: 8),
-                    if (_vehicles.isEmpty) _buildEmptyCard('No vehicles yet. Tap + to add one!')
-                    else ..._vehicles.map((v) => _buildVehicleCard(v)),
+                    if (_vehicles.isEmpty) _fadeInWidget(_buildEmptyCard('No vehicles yet. Tap + to add one!'), 3)
+                    else ..._vehicles.asMap().entries.map((e) => _fadeInWidget(_buildVehicleCard(e.value), 3 + e.key)),
                     const SizedBox(height: 24),
                     Text('Recent Trips', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
                     const SizedBox(height: 4),
                     Text('Tap for map • Long press to delete', style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey)),
                     const SizedBox(height: 8),
-                    if (_trips.isEmpty) _buildEmptyCard('No trips recorded yet.')
-                    else ..._trips.map((t) => _buildTripCard(t)),
+                    if (_trips.isEmpty) _fadeInWidget(_buildEmptyCard('No trips recorded yet.'), 4)
+                    else ..._trips.asMap().entries.map((e) => _fadeInWidget(_buildTripCard(e.value), 4 + e.key)),
                   ],
                 ),
               ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddVehicleScreen()));
+          final result = await Navigator.push(context, SmoothPageRoute(page: const AddVehicleScreen()));
           if (result == true) _loadData();
         },
         backgroundColor: const Color(0xFF2D7AFF), elevation: 2,
@@ -208,7 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildVehicleCard(dynamic vehicle) {
     return GestureDetector(
       onTap: () async {
-        final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => TripScreen(vehicle: vehicle)));
+        final result = await Navigator.push(context, SmoothPageRoute(page: TripScreen(vehicle: vehicle)));
         if (result == true) _loadData();
       },
       onLongPress: () => _deleteVehicle(vehicle['id'], vehicle['vehicle_model'] ?? 'this vehicle'),
@@ -242,7 +258,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     String dateStr = _formatDate(trip['start_time']?.toString());
     String fuelCost = _estimateFuelCost(trip);
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TripMapScreen(tripId: trip['id'], title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip'))),
+      onTap: () => Navigator.push(context, SmoothPageRoute(page: TripMapScreen(tripId: trip['id'], title: '${trip['total_distance']?.toStringAsFixed(1) ?? '0'} km trip'))),
       onLongPress: () => _deleteTrip(trip['id']),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(16),
