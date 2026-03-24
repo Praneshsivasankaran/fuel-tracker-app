@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
-import 'home_screen.dart';
 import '../utils/page_transition.dart';
+import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
     if (result['success']) {
       if (!mounted) return;
-     Navigator.pushReplacement(context, SmoothPageRoute(page: const HomeScreen()));
+      Navigator.pushReplacement(context, SmoothPageRoute(page: const HomeScreen()));
     } else {
       setState(() => _errorMessage = result['message']);
     }
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0D0D0D),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
@@ -41,85 +41,66 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2D7AFF).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(24),
+                  color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0xFF6C63FF).withValues(alpha: 0.3)),
                 ),
-                child: const Icon(Icons.local_gas_station, size: 64, color: Color(0xFF2D7AFF)),
+                child: const Icon(Icons.local_gas_station, size: 64, color: Color(0xFF6C63FF)),
               ),
               const SizedBox(height: 24),
-              Text('Welcome Back', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
+              Text('Welcome Back', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 8),
-              Text('Sign in to continue', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
+              Text('Sign in to continue', style: GoogleFonts.poppins(fontSize: 14, color: Colors.white38)),
               const SizedBox(height: 40),
-              TextField(
-                controller: _emailController,
-                style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E)),
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: GoogleFonts.poppins(color: Colors.grey),
-                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF2D7AFF)),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F7FA),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF2D7AFF), width: 2)),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
+              _buildTextField(_emailController, 'Email', Icons.email_outlined, false),
               const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E)),
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: GoogleFonts.poppins(color: Colors.grey),
-                  prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF2D7AFF)),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F7FA),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.grey.shade200)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF2D7AFF), width: 2)),
-                ),
-              ),
+              _buildTextField(_passwordController, 'Password', Icons.lock_outline, true),
               const SizedBox(height: 12),
               if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(_errorMessage!, style: const TextStyle(color: Colors.redAccent, fontSize: 14)),
-                ),
+                Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(_errorMessage!, style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 14))),
               SizedBox(
-                width: double.infinity,
-                height: 52,
+                width: double.infinity, height: 52,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D7AFF),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                       : Text('Login', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 24),
               GestureDetector(
-                onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterScreen())),
+                onTap: () => Navigator.pushReplacement(context, SmoothPageRoute(page: const RegisterScreen())),
                 child: RichText(
-                  text: TextSpan(
-                    text: "Don't have an account? ",
-                    style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-                    children: [TextSpan(text: 'Register', style: GoogleFonts.poppins(color: const Color(0xFF2D7AFF), fontWeight: FontWeight.w600))],
-                  ),
+                  text: TextSpan(text: "Don't have an account? ", style: GoogleFonts.poppins(color: Colors.white38, fontSize: 14),
+                    children: [TextSpan(text: 'Register', style: GoogleFonts.poppins(color: const Color(0xFF6C63FF), fontWeight: FontWeight.w600))]),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon, bool obscure) {
+    return TextField(
+      controller: controller,
+      style: GoogleFonts.poppins(color: Colors.white),
+      obscureText: obscure,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.poppins(color: Colors.white38),
+        prefixIcon: Icon(icon, color: const Color(0xFF6C63FF)),
+        filled: true,
+        fillColor: const Color(0xFF1A1A2E),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 2)),
+      ),
+      keyboardType: obscure ? null : TextInputType.emailAddress,
     );
   }
 }

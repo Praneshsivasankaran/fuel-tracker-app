@@ -17,23 +17,17 @@ class FuelTrackerApp extends StatelessWidget {
       title: 'Fuel Tracker',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: const Color(0xFF2D7AFF),
-        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0D0D0D),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFF0D0D0D),
           elevation: 0,
-          iconTheme: const IconThemeData(color: Color(0xFF1A1A2E)),
-          titleTextStyle: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1A1A2E),
-          ),
+          titleTextStyle: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF2D7AFF),
-          secondary: Color(0xFF00C9A7),
-          surface: Colors.white,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF6C63FF),
+          secondary: Color(0xFF00E5A0),
+          surface: Color(0xFF1A1A2E),
         ),
       ),
       home: const SplashScreen(),
@@ -48,12 +42,23 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _controller.forward();
     _checkLogin();
   }
+
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
 
   Future<void> _checkLogin() async {
     await Future.delayed(const Duration(seconds: 2));
@@ -69,26 +74,33 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0D0D0D),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2D7AFF).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Icon(Icons.local_gas_station, size: 64, color: Color(0xFF2D7AFF)),
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0xFF6C63FF).withValues(alpha: 0.3)),
+                  ),
+                  child: const Icon(Icons.local_gas_station, size: 64, color: Color(0xFF6C63FF)),
+                ),
+                const SizedBox(height: 24),
+                Text('Fuel Tracker', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                const SizedBox(height: 8),
+                Text('Smart Driving Analytics', style: GoogleFonts.poppins(fontSize: 14, color: Colors.white38)),
+                const SizedBox(height: 40),
+                const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Color(0xFF6C63FF), strokeWidth: 2.5)),
+              ],
             ),
-            const SizedBox(height: 24),
-            Text('Fuel Tracker', style: GoogleFonts.poppins(fontSize: 28, fontWeight: FontWeight.bold, color: const Color(0xFF1A1A2E))),
-            const SizedBox(height: 8),
-            Text('Smart Driving Analytics', style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey)),
-            const SizedBox(height: 40),
-            const CircularProgressIndicator(color: Color(0xFF2D7AFF)),
-          ],
+          ),
         ),
       ),
     );

@@ -22,16 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
+  void initState() { super.initState(); _pageController = PageController(); }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
+  void dispose() { _pageController.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2))],
+          color: const Color(0xFF1A1A2E),
+          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) {
-            _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic);
-          },
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF2D7AFF),
-          unselectedItemColor: Colors.grey,
+          onTap: (index) => _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic),
+          backgroundColor: const Color(0xFF1A1A2E),
+          selectedItemColor: const Color(0xFF6C63FF),
+          unselectedItemColor: Colors.white30,
           selectedLabelStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
           unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
           type: BottomNavigationBarType.fixed,
