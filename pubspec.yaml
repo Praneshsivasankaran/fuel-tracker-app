@@ -17,6 +17,7 @@ dependencies:
   geolocator: ^13.0.2
   google_maps_flutter: ^2.5.0
   fl_chart: ^0.69.2
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +26,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
