@@ -1,17 +1,59 @@
-# fuel_tracker_app
+# 🚗 Fuel Tracker — Smart Driving Analytics App
 
-A new Flutter project.
+A production-ready Flutter mobile application that tracks driving behavior using GPS, predicts fuel consumption using Machine Learning, and provides intelligent driving insights.
 
-## Getting Started
+Built as part of my AIML specialization with a strong focus on real-world app development.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 🚀 Features
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+🔹 Real-time GPS Trip Tracking (Speed, Distance, Duration)  
+🔹 Live Speedometer UI  
+🔹 ML-Based Fuel Consumption Prediction  
+🔹 Smart Driving Score (0–100 Efficiency Rating)  
+🔹 Interactive Trip Maps (Google Maps Integration)  
+🔹 Driving Analytics Dashboard (Charts & Trends)  
+🔹 Vehicle Management System (87+ Indian vehicles)  
+🔹 Fuel Price Tracking  
+🔹 Smooth Dark Glassmorphism UI  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 🧠 What Makes This Unique?
+
+✔ Combines **Mobile App + Backend + ML** in one system  
+✔ Real-time GPS data processing  
+✔ ML model integration inside a production app  
+✔ Clean UI/UX with animations and modern design  
+✔ End-to-end full-stack architecture  
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** Flutter (Dart)
+- **Backend:** FastAPI (Python)
+- **Database:** PostgreSQL
+- **ML Model:** Gradient Boosting Regressor
+- **Maps:** Google Maps SDK
+- **Charts:** fl_chart
+- **State Management:** Provider
+
+---
+
+## 📱 Screens
+
+- Login & Authentication
+- Dashboard (Fuel + Vehicles + Trips)
+- Live Trip Tracking
+- Analytics & Charts
+- Profile Management
+
+---
+
+## ⚙️ Setup
+
+```bash
+flutter pub get
+flutter run
