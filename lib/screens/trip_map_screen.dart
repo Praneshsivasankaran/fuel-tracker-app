@@ -37,8 +37,8 @@ class _TripMapScreenState extends State<TripMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(title: Text(widget.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0D0D0D), elevation: 0, iconTheme: const IconThemeData(color: Colors.white)),
+      backgroundColor: const Color(0xFF0A0A0F),
+      appBar: AppBar(title: Text(widget.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0A0A0F), elevation: 0, iconTheme: const IconThemeData(color: Colors.white)),
       body: _isLoading ? const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)))
           : GoogleMap(initialCameraPosition: CameraPosition(target: _center, zoom: 14), polylines: _polylines, markers: _markers, onMapCreated: (controller) => _mapController = controller, myLocationEnabled: false, zoomControlsEnabled: true),
     );

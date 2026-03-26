@@ -36,8 +36,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(title: Text('Add Vehicle', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0D0D0D), elevation: 0, iconTheme: const IconThemeData(color: Colors.white)),
+      backgroundColor: const Color(0xFF0A0A0F),
+      appBar: AppBar(title: Text('Add Vehicle', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0A0A0F), elevation: 0, iconTheme: const IconThemeData(color: Colors.white)),
       body: SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Center(child: Container(padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(color: const Color(0xFF6C63FF).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF6C63FF).withValues(alpha: 0.3))),
@@ -48,10 +48,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         Text('Brand', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
         const SizedBox(height: 8),
         Container(width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFF1A1A2E), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withValues(alpha: 0.08))),
+          decoration: BoxDecoration(color: const Color(0xFF12121C), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withValues(alpha: 0.08))),
           child: DropdownButtonHideUnderline(child: DropdownButton<String>(
             value: _selectedBrand, hint: Text('Select Brand', style: GoogleFonts.poppins(color: Colors.white38)),
-            dropdownColor: const Color(0xFF1A1A2E), style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
+            dropdownColor: const Color(0xFF12121C), style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
             icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF6C63FF)), isExpanded: true,
             items: _brands.map<DropdownMenuItem<String>>((brand) => DropdownMenuItem(value: brand.toString(), child: Text(brand.toString()))).toList(),
             onChanged: (value) { setState(() { _selectedBrand = value; _selectedModel = null; }); if (value != null) _loadModels(value); },
@@ -67,8 +67,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
         const SizedBox(height: 24),
         if (_selectedModel != null) SizedBox(width: double.infinity, height: 52, child: ElevatedButton(
           onPressed: _isSaving ? null : _addVehicle,
-          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-          child: _isSaving ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)) : Text('Add Vehicle', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5A0), foregroundColor: Colors.black, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+          child: _isSaving ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5)) : Text('Add Vehicle', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
         )),
       ])),
     );
@@ -80,7 +80,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       onTap: () => setState(() => _selectedModel = model),
       child: Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E).withValues(alpha: 0.8), borderRadius: BorderRadius.circular(14),
+          color: const Color(0xFF12121C).withValues(alpha: 0.8), borderRadius: BorderRadius.circular(14),
           border: Border.all(color: isSelected ? const Color(0xFF6C63FF) : Colors.white.withValues(alpha: 0.06), width: isSelected ? 2 : 1),
         ),
         child: Row(children: [

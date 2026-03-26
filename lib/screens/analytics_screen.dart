@@ -19,13 +19,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   Future<void> _loadAnalytics() async {
     final data = await ApiService.getAnalytics();
+    if (!mounted) return;
     setState(() { _data = data; _isLoading = false; });
   }
 
   Widget _glassCard({required Widget child, EdgeInsets? padding}) {
     return Container(
       padding: padding ?? const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF1A1A2E).withValues(alpha: 0.8), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withValues(alpha: 0.06))),
+      decoration: BoxDecoration(color: const Color(0xFF12121C).withValues(alpha: 0.8), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withValues(alpha: 0.06))),
       child: child,
     );
   }
@@ -33,8 +34,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(title: Text('Analytics', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0D0D0D), elevation: 0, automaticallyImplyLeading: false),
+      backgroundColor: const Color(0xFF0A0A0F),
+      appBar: AppBar(title: Text('Analytics', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)), backgroundColor: const Color(0xFF0A0A0F), elevation: 0, automaticallyImplyLeading: false),
       body: _isLoading ? const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)))
           : _data == null || _data!['total_trips'] == 0
               ? Center(child: Text('No trip data yet.\nStart driving to see analytics!', textAlign: TextAlign.center, style: GoogleFonts.poppins(fontSize: 16, color: Colors.white38)))

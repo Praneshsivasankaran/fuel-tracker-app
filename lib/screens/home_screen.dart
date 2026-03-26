@@ -38,23 +38,44 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+          color: const Color(0xFF0E0E18),
+          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.04))),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic),
-          backgroundColor: const Color(0xFF1A1A2E),
-          selectedItemColor: const Color(0xFF6C63FF),
-          unselectedItemColor: Colors.white30,
-          selectedLabelStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: GoogleFonts.poppins(fontSize: 11),
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Dashboard'),
-            BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: 'Analytics'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(0, Icons.dashboard_rounded, 'Dashboard'),
+            _buildNavItem(1, Icons.bar_chart_rounded, 'Analytics'),
+            _buildNavItem(2, Icons.person_rounded, 'Profile'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isSelected = _currentIndex == index;
+    return GestureDetector(
+      onTap: () => _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeOutCubic),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF6C63FF).withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: isSelected ? const Color(0xFF6C63FF) : Colors.white24, size: 22),
+            const SizedBox(height: 4),
+            Text(label, style: GoogleFonts.poppins(
+              fontSize: 10,
+              color: isSelected ? const Color(0xFF6C63FF) : Colors.white24,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            )),
           ],
         ),
       ),

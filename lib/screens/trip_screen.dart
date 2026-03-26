@@ -149,17 +149,17 @@ class _TripScreenState extends State<TripScreen> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: const Color(0xFF12121C),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: const Color(0xFF00C9A7).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.check_circle_rounded, color: Color(0xFF00C9A7), size: 24),
+                decoration: BoxDecoration(color: const Color(0xFF00E5A0).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+                child: const Icon(Icons.check_circle_rounded, color: Color(0xFF00E5A0), size: 24),
               ),
               const SizedBox(width: 12),
-              Text('Trip Complete', style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w600, fontSize: 18)),
+              Text('Trip Complete', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 18)),
             ],
           ),
          content: Column(
@@ -190,8 +190,8 @@ class _TripScreenState extends State<TripScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: const Color(0xFFF5F7FA), borderRadius: BorderRadius.circular(12)),
-                child: Text(result['recommendation'] ?? '', style: GoogleFonts.poppins(color: Colors.grey.shade700, fontSize: 12, fontStyle: FontStyle.italic)),
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(12)),
+                child: Text(result['recommendation'] ?? '', style: GoogleFonts.poppins(color: Colors.white38, fontSize: 12, fontStyle: FontStyle.italic)),
               ),
             ],
           ),
@@ -200,8 +200,8 @@ class _TripScreenState extends State<TripScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () { Navigator.of(ctx).pop(); Navigator.of(context).pop(); },
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2D7AFF), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                child: Text('Done', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5A0), foregroundColor: Colors.black, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                child: Text('Done', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
               ),
             ),
           ],
@@ -216,8 +216,8 @@ class _TripScreenState extends State<TripScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14)),
-          Text(value, style: GoogleFonts.poppins(color: const Color(0xFF1A1A2E), fontSize: 14, fontWeight: FontWeight.w600)),
+          Text(label, style: GoogleFonts.poppins(color: Colors.white38, fontSize: 14)),
+          Text(value, style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -234,12 +234,12 @@ class _TripScreenState extends State<TripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFF0A0A0F),
       appBar: AppBar(
-        title: Text(widget.vehicle['vehicle_model'] ?? 'Trip', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1A1A2E))),
-        backgroundColor: Colors.white,
+        title: Text(widget.vehicle['vehicle_model'] ?? 'Trip', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white)),
+        backgroundColor: const Color(0xFF0A0A0F),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF1A1A2E)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -250,31 +250,31 @@ class _TripScreenState extends State<TripScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF12121C),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
               ),
               child: Column(
                 children: [
-                  Text(_currentSpeed.toStringAsFixed(1), style: GoogleFonts.poppins(fontSize: 64, fontWeight: FontWeight.bold, color: const Color(0xFF2D7AFF))),
-                  Text('km/h', style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey)),
+                  Text(_currentSpeed.toStringAsFixed(0), style: GoogleFonts.poppins(fontSize: 80, fontWeight: FontWeight.bold, color: const Color(0xFF00E5A0))),
+                  Text('km/h', style: GoogleFonts.poppins(fontSize: 18, color: Colors.white30)),
                 ],
               ),
             ),
             const SizedBox(height: 20),
             Row(
               children: [
-                _buildInfoCard('Distance', '${_totalDistance.toStringAsFixed(2)} km', const Color(0xFF2D7AFF)),
+                _buildInfoCard('Distance', '${_totalDistance.toStringAsFixed(2)} km', const Color(0xFF6C63FF)),
                 const SizedBox(width: 12),
-                _buildInfoCard('Max Speed', '${_maxSpeed.toStringAsFixed(1)} km/h', Colors.orange),
+                _buildInfoCard('Max Speed', '${_maxSpeed.toStringAsFixed(1)} km/h', const Color(0xFFFFB800)),
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildInfoCard('Avg Speed', '${_avgSpeed.toStringAsFixed(1)} km/h', const Color(0xFF00C9A7)),
+                _buildInfoCard('Avg Speed', '${_avgSpeed.toStringAsFixed(1)} km/h', const Color(0xFF00E5A0)),
                 const SizedBox(width: 12),
-                _buildInfoCard('Duration', _isTripActive ? _formatDuration() : '00:00', Colors.purple),
+                _buildInfoCard('Duration', _isTripActive ? _formatDuration() : '00:00', const Color(0xFF6C63FF)),
               ],
             ),
             if (_currentPosition != null) ...[
@@ -282,13 +282,13 @@ class _TripScreenState extends State<TripScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
+                decoration: BoxDecoration(color: const Color(0xFF12121C), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white.withValues(alpha: 0.06))),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on_rounded, color: Color(0xFF2D7AFF), size: 16),
+                    const Icon(Icons.location_on_rounded, color: Color(0xFF6C63FF), size: 16),
                     const SizedBox(width: 6),
-                    Text('${_currentPosition!.latitude.toStringAsFixed(4)}, ${_currentPosition!.longitude.toStringAsFixed(4)}', style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                    Text('${_currentPosition!.latitude.toStringAsFixed(4)}, ${_currentPosition!.longitude.toStringAsFixed(4)}', style: GoogleFonts.poppins(fontSize: 12, color: Colors.white38)),
                   ],
                 ),
               ),
@@ -300,13 +300,14 @@ class _TripScreenState extends State<TripScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : (_isTripActive ? _endTrip : _startTrip),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isTripActive ? Colors.redAccent : const Color(0xFF2D7AFF),
+                  backgroundColor: _isTripActive ? const Color(0xFFFF6B6B) : const Color(0xFF00E5A0),
+                  foregroundColor: _isTripActive ? Colors.white : Colors.black,
                   elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(_isTripActive ? 'End Trip' : 'Start Trip', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+                    : Text(_isTripActive ? 'End Trip' : 'Start Trip', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
@@ -319,12 +320,12 @@ class _TripScreenState extends State<TripScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))]),
+        decoration: BoxDecoration(color: const Color(0xFF12121C), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withValues(alpha: 0.06))),
         child: Column(
           children: [
             Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: color)),
             const SizedBox(height: 4),
-            Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+            Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.white38)),
           ],
         ),
       ),
